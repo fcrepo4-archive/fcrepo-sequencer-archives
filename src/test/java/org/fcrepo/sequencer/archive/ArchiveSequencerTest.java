@@ -55,39 +55,4 @@ public class ArchiveSequencerTest extends junit.framework.TestCase {
 			fail(e.toString());
 		}
     }
-
-	@Test
-	public void testExecute()
-	{
-		try
-		{
-			Binary mockBin = mock(Binary.class);
-			when(mockBin.getStream()).thenReturn(zipin);
-			Property mockProp = mock(Property.class);
-			when(mockProp.getName()).thenReturn(JcrConstants.JCR_DATA);
-			when(mockProp.getBinary()).thenReturn(mockBin);
-	
-			Session mockSession = mock(Session.class);
-			Node mockNode = mock(Node.class);
-			when(mockNode.canAddMixin(any(String.class))).thenReturn(true);
-			when(mockNode.getSession()).thenReturn(mockSession);
-			when(mockNode.getNode(any(String.class))).thenReturn(mockNode);
-			when(mockNode.getParent()).thenReturn(mockNode);
-			when(
-				mockNode.setProperty( any(String.class), not(eq(zipContents)) )
-			).thenThrow( new RuntimeException("Incorrect contents") );
-	
-			Context mockContext = mock(Context.class);
-
-			ArchiveSequencer arch = new ArchiveSequencer();
-			//arch.execute( mockProp, mockNode, mockContext );
-// need to handle parent node, etc.
-// need to check for content datastream
-		}
-		catch ( Exception ex )
-		{
-			ex.printStackTrace();
-			fail(ex.getMessage());
-		}
-	}
 }
