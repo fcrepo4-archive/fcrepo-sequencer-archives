@@ -1,17 +1,8 @@
 /*
- * JCR node types for use with Fedora
+ * Archive mixin
  */
-<fcrepo = 'http://fcrepo.org/'>
-<archive = 'http://fcrepo.org/archive/'>
-<jcr = 'http://www.jcp.org/jcr/1.0'>
+<fedora = 'info:fedora'>
 <nt = 'http://www.jcp.org/jcr/nt/1.0'>
 
-/*
-* <mix = 'http://www.jcp.org/jcr/mix/1.0'>
-*
-* [fcrepo:resource] > mix:created, mix:lastModified, mix:lockable, mix:versionable mixin abstract
-*	- fcrepo:created (STRING) COPY
-*/
-
-[fcrepo:archive] > nt:file mixin
-	- archive:contains (STRING) mandatory
+[fedora:archive] > nt:file mixin
+    - fedora:contains (string) copy

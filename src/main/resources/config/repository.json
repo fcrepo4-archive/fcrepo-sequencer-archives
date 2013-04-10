@@ -5,8 +5,7 @@
         "sequencers" : {
             "ArchiveSequencer" : {
                 "classname" : "org.fcrepo.sequencer.archive.ArchiveSequencer",
-                "pathExpressions" : [ "default:/(*)/jcr:content[@jcr:data]" ],
-                "endpoint" : "http://localhost:8000"
+                "pathExpressions" : [ "fedora://(*.zip)/jcr:content[@jcr:data] => /zip" ]
             }
         }
     },

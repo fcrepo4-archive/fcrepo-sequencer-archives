@@ -1,6 +1,7 @@
 package org.fcrepo.sequencer.archive;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -15,6 +16,7 @@ import javax.jcr.NamespaceRegistry;
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
+import javax.jcr.Session;
 import javax.jcr.nodetype.ConstraintViolationException;
 
 import org.modeshape.jcr.api.JcrConstants;
@@ -29,10 +31,11 @@ import org.apache.commons.compress.archivers.ArchiveException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.fcrepo.Datastream;
+import org.fcrepo.services.DatastreamService;
+import org.fcrepo.utils.DatastreamIterator;
+
 public class ArchiveSequencer extends Sequencer {
-	
-	public static String ARCHIVE_MIXIN = "fcrepo:archive";
-	public static String ARCHIVE_CONTAINS_PROPERTY = "archive:contains";
 	
 	private static Logger log = LoggerFactory.getLogger(ArchiveSequencer.class);
 	
@@ -40,41 +43,52 @@ public class ArchiveSequencer extends Sequencer {
     }
 
     @Override
-    public void initialize( NamespaceRegistry registry,
-            NodeTypeManager nodeTypeManager ) throws RepositoryException, IOException {
+    public void initialize( NamespaceRegistry registry, NodeTypeManager nodeTypeManager ) throws RepositoryException, IOException {
     	super.initialize(registry, nodeTypeManager);
+		log.debug("ArchiveSequencer.initialize()");
     }
     
 	@Override
-	public boolean execute(Property inputProperty, Node outputNode, Context context)
-			throws Exception {
-    	log.debug("Sequencing property change: \"{}\", expecting \"{}\"", inputProperty.getName(), JcrConstants.JCR_DATA);
-        if (JcrConstants.JCR_DATA.equals(inputProperty.getName())) {
-        	if (!outputNode.canAddMixin(ARCHIVE_MIXIN)) {
-        		log.error("Cannot add mixin \"{}\" to this node", ARCHIVE_MIXIN);
-        		throw new ConstraintViolationException("Cannot add mixin \"" + ARCHIVE_MIXIN + "\" to this node");
-        	}
+	public boolean execute( Property inputProperty, Node outputNode,
+		Context context) throws Exception {
+    	log.debug(
+			"Sequencing property change: \"{}\", expecting \"{}\"",
+			inputProperty.getName(), JcrConstants.JCR_DATA
+		);
+        if (JcrConstants.JCR_DATA.equals(inputProperty.getName()))
+		{
         	Binary inputBinary = inputProperty.getBinary();
         	InputStream in = inputBinary.getStream();
 			String contents = listContents(in);
+			log.debug("contents: '" + contents + "'");
 
-			if ( contents != null )
+			if ( contents != null && !contents.trim().equals(""))
 			{
-        		outputNode.addMixin(ARCHIVE_MIXIN);
-        		outputNode.setProperty(ARCHIVE_CONTAINS_PROPERTY, contents);
-        		log.debug("Sequenced output node at path: {}", outputNode.getPath());
+				// saving contents to a new datastream
+				String outPath = outputNode.getPath() + "_archiveContents";
+				log.debug("outPath: " + outPath);
+				Session session = outputNode.getSession();
+				Datastream ds = new Datastream( session, outPath );
+				ds.setContent( new ByteArrayInputStream(contents.getBytes()) );
+				session.save();
+        		log.debug( "Sequenced output node at path: {}", outPath );
         		return true;
 			}
         }
         return false;
 	}
-	public static String listContents( InputStream in ) throws IOException, ArchiveException
+	public static String listContents( InputStream in )
+		throws IOException, ArchiveException
 	{
 		ArchiveStreamFactory factory = new ArchiveStreamFactory();
 		ArchiveInputStream arc = null;
 		try {
-			arc = factory.createArchiveInputStream( new BufferedInputStream(in) );
-		} catch ( Exception ex ) {
+			arc = factory.createArchiveInputStream(
+				new BufferedInputStream(in)
+			);
+		}
+		catch ( Exception ex )
+		{
 			log.warn( "Error parsing archive input", ex );
 			return null;
 		}
