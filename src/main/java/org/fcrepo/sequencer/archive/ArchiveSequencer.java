@@ -69,7 +69,10 @@ public class ArchiveSequencer extends Sequencer {
 				log.debug("outPath: " + outPath);
 				Session session = outputNode.getSession();
 				Datastream ds = new Datastream( session, outPath );
-				ds.setContent( new ByteArrayInputStream(contents.getBytes()) );
+				ds.setContent(
+					new ByteArrayInputStream(contents.getBytes()),
+					"text/plain", null, null
+				);
 				session.save();
         		log.debug( "Sequenced output node at path: {}", outPath );
         		return true;
