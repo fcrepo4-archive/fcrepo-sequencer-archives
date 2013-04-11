@@ -1,8 +1,0 @@
-/*
- * Archive mixin
- */
-<fedora = 'info:fedora'>
-<nt = 'http://www.jcp.org/jcr/nt/1.0'>
-
-[fedora:archive] > nt:file mixin
-    - fedora:contains (string) copy
