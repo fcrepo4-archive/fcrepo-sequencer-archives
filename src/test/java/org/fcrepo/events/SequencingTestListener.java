@@ -1,3 +1,4 @@
+
 package org.fcrepo.events;
 
 import static org.modeshape.jcr.api.observation.Event.Sequencing.SEQUENCED_NODE_PATH;
@@ -13,30 +14,35 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SequencingTestListener implements EventListener {
-	private static Logger LOG = LoggerFactory.getLogger(SequencingTestListener.class);
-	private ConcurrentHashMap<String, Event> sequencingEvents;
-	
-    public SequencingTestListener(ConcurrentHashMap<String, Event> sequencingEvents) {
-    	this.sequencingEvents = sequencingEvents;
+
+    private static Logger LOG = LoggerFactory
+            .getLogger(SequencingTestListener.class);
+
+    private ConcurrentHashMap<String, Event> sequencingEvents;
+
+    public SequencingTestListener(
+            ConcurrentHashMap<String, Event> sequencingEvents) {
+        this.sequencingEvents = sequencingEvents;
     }
-    
-	@Override
-	public void onEvent(EventIterator events) {
+
+    @Override
+    public void onEvent(EventIterator events) {
         while (events.hasNext()) {
             try {
-                Event event = (Event)events.nextEvent();
+                Event event = (Event) events.nextEvent();
                 LOG.info("Received event: " + event.toString());
                 Map<?, ?> info = event.getInfo();
-                for (Object key: info.keySet()){
-                	LOG.debug("EVENT INFO: " + key + " => " + info.get(key));
+                for (Object key : info.keySet()) {
+                    LOG.debug("EVENT INFO: " + key + " => " + info.get(key));
                 }
-                sequencingEvents.putIfAbsent((String)event.getInfo().get(SEQUENCED_NODE_PATH), event);
+                sequencingEvents.putIfAbsent((String) event.getInfo().get(
+                        SEQUENCED_NODE_PATH), event);
 
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }
         }
-	
-	}
+
+    }
 
 }

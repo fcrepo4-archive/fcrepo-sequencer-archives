@@ -1,3 +1,4 @@
+
 package org.fcrepo.integration.sequencer.archives;
 
 import static java.lang.Integer.parseInt;
@@ -61,6 +62,7 @@ public abstract class AbstractResourceIT {
     protected static HttpPost postObjMethod(final String pid) {
         return new HttpPost(serverAddress + "/rest/objects/" + pid);
     }
+
     protected static HttpPost postDSMethod(final String pid, final String ds,
             final File file) throws UnsupportedEncodingException {
         final HttpPost post =
