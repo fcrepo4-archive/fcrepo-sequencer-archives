@@ -1,8 +1,10 @@
 
 package org.modeshape.jcr;
 
+import static com.google.common.base.Throwables.propagate;
+import static com.google.common.collect.ImmutableList.builder;
+
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -10,40 +12,43 @@ import java.util.UUID;
 import org.modeshape.jcr.JcrRepository.RunningState;
 import org.modeshape.jcr.api.sequencer.Sequencer;
 
-public class RunningStateProxy {
+import com.google.common.collect.ImmutableList.Builder;
 
-    public static RunningState getRunningState(JcrRepository repo) {
-        return repo.runningState();
-    }
+public class RunningStateProxy {
 
     private final RunningState state;
 
-    public RunningStateProxy(JcrRepository repo) {
+    public static RunningState getRunningState(final JcrRepository repo) {
+        return repo.runningState();
+    }
+
+    public RunningStateProxy(final JcrRepository repo) {
         this.state = repo.runningState();
     }
 
     public Sequencers getSequencers() {
-        Sequencers result = state.sequencers();
-        result.getClass();
-        return result;
+        return state.sequencers();
     }
 
-    public <T extends Sequencer> List<T> getSequencersByType(Class<T> clazz) {
-        ArrayList<T> result = new ArrayList<T>();
+    public <T extends Sequencer> List<T> getSequencersByType(
+            final Class<T> clazz) {
+        final Builder<T> result = builder();
+
         try {
-            Field sequencers =
+            final Field sequencers =
                     Sequencers.class.getDeclaredField("sequencersById");
             sequencers.setAccessible(true);
-            Object uncast = sequencers.get(getSequencers());
-            Map<UUID, Sequencer> map = (Map) uncast;
-            for (Sequencer s : map.values()) {
+            @SuppressWarnings("unchecked")
+            final Map<UUID, T> map =
+                    (Map<UUID, T>) sequencers.get(getSequencers());
+            for (final T s : map.values()) {
                 if (clazz.isAssignableFrom(s.getClass())) {
-                    result.add((T) s);
+                    result.add(s);
                 }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (final Exception e) {
+            throw propagate(e);
         }
-        return result;
+        return result.build();
     }
 }

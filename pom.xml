@@ -1,47 +1,28 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
-
   <parent>
     <groupId>org.fcrepo</groupId>
     <artifactId>fcrepo</artifactId>
     <version>4.0-SNAPSHOT</version>
   </parent>
-
   <artifactId>fcrepo-sequencer-archive</artifactId>
   <packaging>bundle</packaging>
-
   <description>fedora 4.x sequencer to process archive files</description>
-
   <name>fcrepo 4.x sequencer to process archive files</name>
-
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding><!-- XXX -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding><!-- 
+      XXX -->
     <resteasy.version>2.3.5.Final</resteasy.version>
   </properties>
-
-  <url>http://maven.apache.org</url><!-- XXX -->
-
   <dependencies>
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>fcrepo-http-commons</artifactId>
       <version>${project.version}</version>
     </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.enunciate</groupId>
-      <artifactId>enunciate-cxf-rt</artifactId>
-      <version>${enunciate.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>commons-logging</groupId>
-          <artifactId>commons-logging</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
     <!-- RESTEasy -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
@@ -65,21 +46,18 @@
         </exclusion>
       </exclusions>
     </dependency>
-
     <!-- Apache Velocity -->
     <dependency>
       <groupId>org.apache.velocity</groupId>
       <artifactId>velocity</artifactId>
       <version>1.7</version>
     </dependency>
-
     <dependency>
       <groupId>org.fcrepo</groupId>
       <artifactId>fcrepo-kernel</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
-
     <!-- test gear -->
     <dependency>
       <groupId>org.fcrepo</groupId>
@@ -99,32 +77,49 @@
       <artifactId>junit</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.sun.grizzly</groupId>
+      <artifactId>grizzly-servlet-webserver</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-grizzly</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-spring</artifactId>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-core</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.fcrepo</groupId>
+      <artifactId>fcrepo-http-commons</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+      <type>test-jar</type>
+    </dependency>
+    <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-test</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-transports-http-jetty</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-rt-rs-extension-providers</artifactId>
-      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpclient</artifactId>
     </dependency>
-
-    <!-- This dependency is for compile-time: it keeps this module independent
-      of any given choice of JAX-RS implementation. It must be _after_ the test
-      gear. Otherwise it will get loaded during test phase, but because this is
+    <!-- This dependency is for compile-time: it keeps this module independent 
+      of any given choice of JAX-RS implementation. It must be _after_ the test 
+      gear. Otherwise it will get loaded during test phase, but because this is 
       just an API, the tests will not be able to execute. -->
     <dependency>
       <groupId>javax</groupId>
@@ -143,81 +138,15 @@
       </exclusions>
     </dependency>
     <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-core</artifactId>
-        <scope>test</scope>
-    </dependency>
-
-
-
-<!-- not in fcrepo-http-api:
-    <dependency>
-    	<groupId>org.modeshape</groupId>
-    	<artifactId>modeshape-jcr-api</artifactId>
-    	<version>3.2-SNAPSHOT</version>
-    </dependency>
-    <dependency>
       <groupId>org.mockito</groupId>
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>org.modeshape</groupId>
-    	<artifactId>modeshape-jcr</artifactId>
-    	<scope>test</scope>
-    	<version>3.2-SNAPSHOT</version>
-    	<classifier>tests</classifier>
-    </dependency>
-    <dependency>
-    	<groupId>org.modeshape</groupId>
-    	<artifactId>modeshape-schematic</artifactId>
-    	<version>3.2-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.modeshape</groupId>
-    	<artifactId>modeshape-common</artifactId>
-    	<version>3.2-SNAPSHOT</version>
-    </dependency>
-    <dependency>
-    	<groupId>org.modeshape</groupId>
-    	<artifactId>modeshape-jcr</artifactId>
-    	<version>3.2-SNAPSHOT</version>
-    	<exclusions>
-    	  <exclusion>
-    	    <groupId>org.modeshape</groupId>
-    	    <artifactId>modeshape-jcr-api</artifactId>
-    	  </exclusion>
-    	  <exclusion>
-    	    <groupId>org.modeshape</groupId>
-    	    <artifactId>modeshape-schematic</artifactId>
-    	  </exclusion>
-    	  <exclusion>
-    	    <groupId>org.modeshape</groupId>
-    	    <artifactId>modeshape-common</artifactId>
-    	  </exclusion>
-    	</exclusions>
-    </dependency>
-    <dependency>
-        <groupId>org.infinispan</groupId>
-        <artifactId>infinispan-core</artifactId>
-        <version>5.2.0.Final</version>
-    	<classifier>tests</classifier>
-      </dependency>
-
-    <dependency>
-    	<groupId>ch.qos.logback</groupId>
-    	<artifactId>logback-classic</artifactId>
-    </dependency>
--->
-
-<!-- not in fcrepo-http-api, but needed by ArchiveSequencer: -->
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-compress</artifactId>
       <version>1.5</version>
     </dependency>
-
-
   </dependencies>
   <build>
     <plugins>
@@ -226,22 +155,9 @@
         <artifactId>maven-bundle-plugin</artifactId>
       </plugin>
       <plugin>
-        <groupId>org.codehaus.enunciate</groupId>
-        <artifactId>maven-enunciate-cxf-plugin</artifactId>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
       </plugin>
     </plugins>
   </build>
-
-<!--
-  <repositories>
-    <repository>
-      <id>htmleasy</id>
-      <url>http://htmleasy-maven.googlecode.com/svn/trunk/</url>
-    </repository>
-  </repositories>
--->
 </project>

@@ -1,6 +1,10 @@
 
 package org.fcrepo.sequencer.archive;
 
+import static com.google.common.base.Throwables.propagate;
+import static javax.ws.rs.core.MediaType.TEXT_PLAIN;
+import static org.modeshape.jcr.api.JcrConstants.JCR_DATA;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -12,13 +16,12 @@ import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
-
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
 import org.apache.commons.compress.archivers.ArchiveStreamFactory;
 import org.fcrepo.Datastream;
-import org.modeshape.jcr.api.JcrConstants;
+import org.fcrepo.exception.InvalidChecksumException;
 import org.modeshape.jcr.api.nodetype.NodeTypeManager;
 import org.modeshape.jcr.api.sequencer.Sequencer;
 import org.slf4j.Logger;
@@ -26,60 +29,69 @@ import org.slf4j.LoggerFactory;
 
 public class ArchiveSequencer extends Sequencer {
 
-    private static Logger log = LoggerFactory.getLogger(ArchiveSequencer.class);
+    private static final Logger LOG = LoggerFactory
+            .getLogger(ArchiveSequencer.class);
 
     public ArchiveSequencer() {
     }
 
     @Override
-    public void initialize(NamespaceRegistry registry,
-            NodeTypeManager nodeTypeManager) throws RepositoryException,
+    public void initialize(final NamespaceRegistry registry,
+            final NodeTypeManager nodeTypeManager) throws RepositoryException,
             IOException {
         super.initialize(registry, nodeTypeManager);
-        log.debug("ArchiveSequencer.initialize()");
+        LOG.trace("ArchiveSequencer initialized");
     }
 
     @Override
-    public boolean execute(Property inputProperty, Node outputNode,
-            Context context) throws Exception {
-        log.debug("Sequencing property change: \"{}\", expecting \"{}\"",
-                inputProperty.getName(), JcrConstants.JCR_DATA);
-        if (JcrConstants.JCR_DATA.equals(inputProperty.getName())) {
-            Binary inputBinary = inputProperty.getBinary();
-            InputStream in = inputBinary.getStream();
-            String contents = listContents(in);
-            log.debug("contents: '" + contents + "'");
-
-            if (contents != null && !contents.trim().equals("")) {
-                // saving contents to a new datastream
-                String outPath = outputNode.getPath() + "_archiveContents";
-                log.debug("outPath: " + outPath);
-                Session session = outputNode.getSession();
-                Datastream ds = new Datastream(session, outPath);
-                ds.setContent(new ByteArrayInputStream(contents.getBytes()),
-                        "text/plain", null, null);
-                session.save();
-                log.debug("Sequenced output node at path: {}", outPath);
-                return true;
+    public boolean execute(final Property inputProperty, final Node outputNode,
+            final Context context) throws RepositoryException, IOException,
+            ArchiveException, InvalidChecksumException {
+        LOG.debug("Sequencing property change: \"{}\", expecting \"{}\"",
+                inputProperty.getName(), JCR_DATA);
+        if (JCR_DATA.equals(inputProperty.getName())) {
+            final Binary inputBinary = inputProperty.getBinary();
+            try (final InputStream in = inputBinary.getStream()) {
+                final String contents = listContents(in);
+                LOG.debug("contents: '" + contents + "'");
+                if (contents != null && !contents.trim().equals("")) {
+                    // saving contents to a new datastream
+                    final String outPath =
+                            outputNode.getPath() + "_archiveContents";
+                    LOG.debug("outPath: " + outPath);
+                    final Session session = outputNode.getSession();
+                    final Datastream ds = new Datastream(session, outPath);
+                    ds.setContent(
+                            new ByteArrayInputStream(contents.getBytes()),
+                            TEXT_PLAIN, null, null);
+                    session.save();
+                    LOG.debug("Sequenced output node at path: {}", outPath);
+                    return true;
+                } else {
+                    LOG.warn("Empty contents in archive at: {}", inputProperty
+                            .getPath());
+                }
             }
         }
+        LOG.debug("{} was not a {} ", inputProperty.getName(), JCR_DATA);
         return false;
     }
 
-    public static String listContents(InputStream in) throws IOException,
+    public static String listContents(final InputStream in) throws IOException,
             ArchiveException {
-        ArchiveStreamFactory factory = new ArchiveStreamFactory();
-        ArchiveInputStream arc = null;
-        try {
-            arc = factory.createArchiveInputStream(new BufferedInputStream(in));
-        } catch (Exception ex) {
-            log.warn("Error parsing archive input", ex);
-            return null;
+        final ArchiveStreamFactory factory = new ArchiveStreamFactory();
+        try (ArchiveInputStream arc =
+                factory.createArchiveInputStream(new BufferedInputStream(in))) {
+            final StringBuffer contents = new StringBuffer();
+            for (ArchiveEntry entry = null; (entry = arc.getNextEntry()) != null;) {
+                contents.append(entry.getName());
+                contents.append("\n");
+            }
+            return contents.toString();
+        } catch (final Exception ex) {
+            LOG.error("Error parsing archive input", ex);
+            throw propagate(ex);
         }
-        StringBuffer contents = new StringBuffer();
-        for (ArchiveEntry entry = null; (entry = arc.getNextEntry()) != null;) {
-            contents.append(entry.getName() + "\n");
-        }
-        return contents.toString();
+
     }
 }
