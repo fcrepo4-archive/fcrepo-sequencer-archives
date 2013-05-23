@@ -8,6 +8,7 @@
   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
   <context:property-placeholder/>
+  <context:annotation-config/>
   
   <!-- show stack traces for easier debugging -->
   <bean id="wildcardExceptionmapper" class="org.fcrepo.exceptionhandlers.WildcardExceptionMapper" >

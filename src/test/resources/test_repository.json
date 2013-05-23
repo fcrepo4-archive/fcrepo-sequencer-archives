@@ -2,9 +2,12 @@
     "name": "Archive Sequencer Test Repository",
     "jndiName": "",
     "workspaces": {
-        "predefined": ["fedora"],
-        "default": "fedora",
+        "predefined": ["default"],
+        "default": "default",
         "allowCreation": true
+    },
+    "clustering" : {
+        "clusterName" : "modeshape-cluster"
     },
     "sequencing": {
         "removeDerivedContentWithOriginal": true,
@@ -18,17 +21,13 @@
         "cacheConfiguration": "test_infinispan_configuration.xml",
         "binaryStorage": {
             "type": "cache",
-            "dataCacheName": "FedoraRepository",
+            "dataCacheName": "FedoraRepositoryBinaryData",
             "metadataCacheName": "FedoraRepository"
         }
     },
     "security": {
         "anonymous": {
-            "roles": [
-                "readonly",
-                "readwrite",
-                "admin"
-            ],
+            "roles": [ "readonly", "readwrite", "admin" ],
             "useOnFailedLogin": false
         },
         "providers": [{"classname": "servlet"}]

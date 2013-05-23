@@ -63,7 +63,7 @@ public class ArchiveSequencer extends Sequencer {
                     final Datastream ds = new Datastream(session, outPath);
                     ds.setContent(
                             new ByteArrayInputStream(contents.getBytes()),
-                            TEXT_PLAIN, null, null);
+                            TEXT_PLAIN, null, null, null);
                     session.save();
                     LOG.debug("Sequenced output node at path: {}", outPath);
                     return true;
