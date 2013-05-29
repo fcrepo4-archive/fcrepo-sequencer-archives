@@ -42,21 +42,4 @@ public abstract class AbstractResourceIT {
         client = new DefaultHttpClient(connectionManager);
     }
 
-    protected int getStatus(final HttpUriRequest method)
-            throws ClientProtocolException, IOException {
-        return client.execute(method).getStatusLine().getStatusCode();
-    }
-
-    protected static HttpPost postObjMethod(final String pid) {
-        return new HttpPost(serverAddress + "/rest/objects/" + pid);
-    }
-
-    protected static HttpPost postDSMethod(final String pid, final String ds,
-            final File file) throws UnsupportedEncodingException {
-        final HttpPost post =
-                new HttpPost(serverAddress + "/rest/objects/" + pid +
-                        "/datastreams/" + ds);
-        post.setEntity(new FileEntity(file));
-        return post;
-    }
 }

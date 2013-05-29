@@ -55,8 +55,15 @@ public class ArchiveSequencerIT extends AbstractResourceIT {
         log.debug("Uploaded zip file to {}.", uploadNode.getPath());
 
         final HttpGet dsListGet =
-                new HttpGet(serverAddress + "/rest/objects/" + pid +
-                        "/datastreams/");
+                new HttpGet(serverAddress + "/rest/" + pid);
+
+        for (int i = 0; i < 10; i++) {
+            if (client.execute(dsListGet).getStatusLine().getStatusCode() == 200) {
+                break;
+            }
+            Thread.sleep(250);
+        }
+
         final String dsList =
                 EntityUtils.toString(client.execute(dsListGet).getEntity());
         log.debug("dsList: " + dsList);
@@ -69,15 +76,15 @@ public class ArchiveSequencerIT extends AbstractResourceIT {
 
         // check _archiveContents datastream content
         final HttpGet extractedContents =
-                new HttpGet(serverAddress + "/rest/objects/" + pid +
-                        "/datastreams/" + dsid + "_archiveContents/content");
+                new HttpGet(serverAddress + "/rest/" + pid +
+                                    "/" + dsid + "_archiveContents/fcr:content");
         final String actual =
                 EntityUtils.toString(client.execute(extractedContents)
-                        .getEntity());
+                                             .getEntity());
         log.debug("Contents of " + extractedContents.toString() + " are \n" +
-                actual);
-        Thread.sleep(2000);
+                          actual);
         assertTrue("Sequencer output not saved", zipContent.equals(actual));
         log.debug("Sequencer output was saved.");
+
     }
 }

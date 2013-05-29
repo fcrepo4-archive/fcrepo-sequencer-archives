@@ -13,16 +13,14 @@
         "removeDerivedContentWithOriginal": true,
         "sequencers": {"ArchiveSequencer": {
             "classname": "org.fcrepo.sequencer.archive.ArchiveSequencer",
-            "pathExpressions": ["fedora:/uploads/(*)/(*.zip)/jcr:content[@jcr:data] => fedora:/objects/$1/$2"]
+            "pathExpressions": ["default:/uploads/(*)/(*.zip)/jcr:content[@jcr:data] => default:/$1/$2"]
         }}
     },
     "storage": {
         "cacheName": "FedoraRepository",
         "cacheConfiguration": "test_infinispan_configuration.xml",
         "binaryStorage": {
-            "type": "cache",
-            "dataCacheName": "FedoraRepositoryBinaryData",
-            "metadataCacheName": "FedoraRepository"
+            "type": "transient"
         }
     },
     "security": {
