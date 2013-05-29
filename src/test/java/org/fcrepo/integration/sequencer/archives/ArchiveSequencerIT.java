@@ -1,6 +1,7 @@
 
 package org.fcrepo.integration.sequencer.archives;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.modeshape.jcr.api.JcrConstants.JCR_CONTENT;
 import static org.modeshape.jcr.api.JcrConstants.JCR_DATA;
@@ -14,6 +15,7 @@ import javax.jcr.Node;
 import javax.jcr.Repository;
 import javax.jcr.Session;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.junit.Test;
@@ -22,8 +24,7 @@ import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
-@ContextConfiguration({"/spring-test/repo.xml", "/spring-test/rest.xml",
-        "/spring-test/test-container.xml"})
+@ContextConfiguration({"/spring-test/repo.xml"})
 public class ArchiveSequencerIT extends AbstractResourceIT {
 
     @Autowired
@@ -47,44 +48,28 @@ public class ArchiveSequencerIT extends AbstractResourceIT {
         log.debug("Uploading zip file...");
         final Node uploadNode =
                 jcrTools.findOrCreateNode(session, "/uploads/" + pid).addNode(
-                        dsid);
+                                                                                     dsid);
 
         uploadNode.addNode(JCR_CONTENT).setProperty(JCR_DATA,
-                session.getValueFactory().createBinary(zipfile));
+                                                           session.getValueFactory().createBinary(zipfile));
         session.save();
         log.debug("Uploaded zip file to {}.", uploadNode.getPath());
 
-        final HttpGet dsListGet =
-                new HttpGet(serverAddress + "/rest/" + pid);
-
         for (int i = 0; i < 10; i++) {
-            if (client.execute(dsListGet).getStatusLine().getStatusCode() == 200) {
+            if (session.nodeExists("/" + pid)) {
                 break;
             }
             Thread.sleep(250);
         }
 
-        final String dsList =
-                EntityUtils.toString(client.execute(dsListGet).getEntity());
-        log.debug("dsList: " + dsList);
-        /*
-         * assertTrue(
-         * dsid + "_archiveContents datastream not created:\n"+dsList,
-         * dsList.indexOf(dsid + "_archiveContents") != -1
-         * );
-         */
+        assertTrue(session.nodeExists("/" + pid));
+        assertTrue(session.nodeExists("/" + pid + "/1.zip_archiveContents"));
 
-        // check _archiveContents datastream content
-        final HttpGet extractedContents =
-                new HttpGet(serverAddress + "/rest/" + pid +
-                                    "/" + dsid + "_archiveContents/fcr:content");
-        final String actual =
-                EntityUtils.toString(client.execute(extractedContents)
-                                             .getEntity());
-        log.debug("Contents of " + extractedContents.toString() + " are \n" +
-                          actual);
-        assertTrue("Sequencer output not saved", zipContent.equals(actual));
-        log.debug("Sequencer output was saved.");
+        InputStream contentStream = session.getNode("/" + pid + "/1.zip_archiveContents/jcr:content").getProperty("jcr:data").getBinary().getStream();
+        assertEquals(zipContent, IOUtils.toString(contentStream));
+
+
+
 
     }
 }

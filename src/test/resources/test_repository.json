@@ -6,29 +6,12 @@
         "default": "default",
         "allowCreation": true
     },
-    "clustering" : {
-        "clusterName" : "modeshape-cluster"
-    },
     "sequencing": {
         "removeDerivedContentWithOriginal": true,
         "sequencers": {"ArchiveSequencer": {
             "classname": "org.fcrepo.sequencer.archive.ArchiveSequencer",
             "pathExpressions": ["default:/uploads/(*)/(*.zip)/jcr:content[@jcr:data] => default:/$1/$2"]
         }}
-    },
-    "storage": {
-        "cacheName": "FedoraRepository",
-        "cacheConfiguration": "test_infinispan_configuration.xml",
-        "binaryStorage": {
-            "type": "transient"
-        }
-    },
-    "security": {
-        "anonymous": {
-            "roles": [ "readonly", "readwrite", "admin" ],
-            "useOnFailedLogin": false
-        },
-        "providers": [{"classname": "servlet"}]
     },
     "node-types": ["fedora-node-types.cnd"]
 }
