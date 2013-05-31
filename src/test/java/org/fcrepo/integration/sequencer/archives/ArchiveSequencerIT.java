@@ -16,8 +16,6 @@ import javax.jcr.Repository;
 import javax.jcr.Session;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.util.EntityUtils;
 import org.junit.Test;
 import org.modeshape.jcr.api.JcrTools;
 import org.slf4j.Logger;
