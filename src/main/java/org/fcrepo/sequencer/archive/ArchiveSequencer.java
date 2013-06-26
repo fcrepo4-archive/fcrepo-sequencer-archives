@@ -16,6 +16,7 @@ import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.ArchiveException;
 import org.apache.commons.compress.archivers.ArchiveInputStream;
@@ -32,13 +33,16 @@ public class ArchiveSequencer extends Sequencer {
     private static final Logger LOG = LoggerFactory
             .getLogger(ArchiveSequencer.class);
 
+    /**
+     * TODO
+     */
     public ArchiveSequencer() {
     }
 
     @Override
     public void initialize(final NamespaceRegistry registry,
             final NodeTypeManager nodeTypeManager) throws RepositoryException,
-            IOException {
+        IOException {
         super.initialize(registry, nodeTypeManager);
         LOG.trace("ArchiveSequencer initialized");
     }
@@ -46,7 +50,7 @@ public class ArchiveSequencer extends Sequencer {
     @Override
     public boolean execute(final Property inputProperty, final Node outputNode,
             final Context context) throws RepositoryException, IOException,
-            ArchiveException, InvalidChecksumException {
+        ArchiveException, InvalidChecksumException {
         LOG.debug("Sequencing property change: \"{}\", expecting \"{}\"",
                 inputProperty.getName(), JCR_DATA);
         if (JCR_DATA.equals(inputProperty.getName())) {
@@ -77,8 +81,16 @@ public class ArchiveSequencer extends Sequencer {
         return false;
     }
 
+    /**
+     * TODO
+     * 
+     * @param in
+     * @return
+     * @throws IOException
+     * @throws ArchiveException
+     */
     public static String listContents(final InputStream in) throws IOException,
-            ArchiveException {
+        ArchiveException {
         final ArchiveStreamFactory factory = new ArchiveStreamFactory();
         try (ArchiveInputStream arc =
                 factory.createArchiveInputStream(new BufferedInputStream(in))) {
