@@ -46,10 +46,10 @@ public class ArchiveSequencerIT extends AbstractResourceIT {
         log.debug("Uploading zip file...");
         final Node uploadNode =
                 jcrTools.findOrCreateNode(session, "/uploads/" + pid).addNode(
-                                                                                     dsid);
+                        dsid);
 
         uploadNode.addNode(JCR_CONTENT).setProperty(JCR_DATA,
-                                                           session.getValueFactory().createBinary(zipfile));
+                session.getValueFactory().createBinary(zipfile));
         session.save();
         log.debug("Uploaded zip file to {}.", uploadNode.getPath());
 
@@ -63,11 +63,11 @@ public class ArchiveSequencerIT extends AbstractResourceIT {
         assertTrue(session.nodeExists("/" + pid));
         assertTrue(session.nodeExists("/" + pid + "/1.zip_archiveContents"));
 
-        InputStream contentStream = session.getNode("/" + pid + "/1.zip_archiveContents/jcr:content").getProperty("jcr:data").getBinary().getStream();
+        InputStream contentStream =
+                session.getNode(
+                        "/" + pid + "/1.zip_archiveContents/jcr:content")
+                        .getProperty("jcr:data").getBinary().getStream();
         assertEquals(zipContent, IOUtils.toString(contentStream));
-
-
-
 
     }
 }
