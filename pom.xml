@@ -26,6 +26,10 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+    </dependency>
     <!-- test gear -->
     <!-- <dependency> <groupId>org.fcrepo</groupId> <artifactId>fcrepo-http-commons</artifactId> 
       <version>${project.version}</version> <scope>test</scope> <type>test-jar</type> </dependency> -->
@@ -72,6 +76,7 @@
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <scope>test</scope>
     </dependency>
     <!-- This dependency is for compile-time: it keeps this module independent of 
       any given choice of JAX-RS implementation. It must be _after_ the test gear. Otherwise 
