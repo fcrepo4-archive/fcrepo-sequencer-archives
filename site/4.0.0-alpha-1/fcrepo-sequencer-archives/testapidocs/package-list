@@ -1,0 +1,4 @@
+org.fcrepo.events
+org.fcrepo.integration.sequencer.archives
+org.fcrepo.sequencer.archive
+org.modeshape.jcr
